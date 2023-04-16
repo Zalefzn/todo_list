@@ -4,7 +4,7 @@
 
     if(isset($_POST['send'])){
 
-        $name = $_POST['task'];
+        $name = htmlspecialchars($_POST['task']);
 
         $sql = "insert into tasks (name) values ('$name')";
 
@@ -15,8 +15,5 @@
         }
 
     }
-
-    
-
 
 ?>

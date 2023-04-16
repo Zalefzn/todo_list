@@ -2,16 +2,14 @@
 
 <?php 
     include 'db.php';
+    if(isset($_POST['search'])){
+
+        $name = htmlspecialchars($_POST['search']);
+        
+        $sql = "select * from tasks where name like '%$name%'";
+        $rows = $db->query($sql);
+    }
     
-    $page = (isset($_GET['page']) ? (int)$_GET['page'] : 1);
-    $perPage = (isset($_GET['per-page'])  && (int)$_GET['per-page'] <= 50 ? (int)$_GET['per-page'] : 5);
-    $start = ($page > 1) ? ($page * $perPage) - $perPage : 0;
-
-    $sql = "select * from tasks limit ".$start." , ".$perPage." ";
-    $total = $db->query("select * from tasks")->num_rows;
-    $pages = ceil($total / $perPage);
-
-    $rows = $db->query($sql);
 ?>
 
 <html lang="en">
@@ -31,44 +29,52 @@
             <div class="row" style="margin-top: 70px;">
                <center><h1>Todo List</h1></center>
                <div class="col-md-10 col-md-offset-1">
-
-                    
-                
-               <table class="table table-hover">
                 <button type="button" class="btn btn-success" data-toggle="modal" data-target="#myModal">Add Task</button>
                 <button type="button" class="btn btn-warning pull-right">Print</button>
                 <hr><br>
-
                 <div class="col-md-10 col-md-offset-1 text-center" style="margin-top: 20px; margin-bottom: 20px">
                 <p>Search</p>
                     <form method="post" action="search.php" class="form-group">
                         <input type="text" placeholder="search name here..." class="form-control" name="search">
                     </form>
                 </div>
-            <!-- Modal -->
-            <div id="myModal" class="modal fade" role="dialog">
-                <div class="modal-dialog">
-                    <!-- Modal content-->
-                    <div class="modal-content">
-                    <div class="modal-header">
-                        <button type="button" class="close" data-dismiss="modal">&times;</button>
-                        <h4 class="modal-title">Add Task</h4>
-                    </div>
-                    <div class="modal-body">
-                       <form method="post" action="add.php">
-                            <div class="form-group">
-                                <label>Task Name</label>
-                                <input type="text" required name="task" class="form-control">
-                            </div>
-                            <input type="submit" name="send" value="Add Task" class="btn btn-success">
-                       </form>
-                    </div>
-                    <div class="modal-footer">
-                        <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                    </div>
+                 <!-- Modal -->
+                <div id="myModal" class="modal fade" role="dialog">
+                    <div class="modal-dialog">
+                        <!-- Modal content-->
+                        <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal">&times;</button>
+                            <h4 class="modal-title">Add Task</h4>
+                        </div>
+                        <div class="modal-body">
+                        <form method="post" action="add.php">
+                                <div class="form-group">
+                                    <label>Task Name</label>
+                                    <input type="text" required name="task" class="form-control">
+                                </div>
+                                <input type="submit" name="send" value="Add Task" class="btn btn-success">
+                        </form>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                        </div>
+                        </div>
                     </div>
                 </div>
-            </div>
+                    
+               <?php 
+                    if(mysqli_num_rows($rows) < 1):
+                ?>
+
+                    <h2 class="text-danger  text-center">Nothing Found!</h2>
+                    <a href="index.php" class="btn btn-warning">Back</a>
+
+                <?php 
+                    else:
+                ?>
+    
+            <table class="table table-hover">
             <thead>
                 <tr>
                 <th scope="col">id.</th>
@@ -90,17 +96,7 @@
                 ?>
             </tbody>
         </table>
-        <center>
-            <ul class="pagination">
-                <?php 
-                    for($i = 1; $i <= $pages; $i++):
-                ?>
-                <li><a href="?page=<?php echo $i ?>&per-page=<?php echo $perPage ?>"><?php echo $i ?></a></li>
-                <?php
-                    endfor;
-                ?>
-            </ul>
-        </center>
+        <?php endif; ?>
                </div>
             </div>
         </div>
